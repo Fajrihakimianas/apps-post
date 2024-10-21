@@ -3,9 +3,13 @@
 import React, { useEffect } from 'react';
 import { Button, Form, Input, Modal, message } from 'antd';
 import axios from 'axios';
+import { useDispatch } from 'react-redux';
+import { updatePost } from '@/api';
 
 const FormUpdateModal = (props) => {
   const { open, toggle, row } = props;
+
+  const dispatch = useDispatch();
 
   const [form] = Form.useForm();
 
@@ -32,10 +36,7 @@ const FormUpdateModal = (props) => {
     };
 
     try {
-      const response = await axios.put(
-        `https://jsonplaceholder.typicode.com/posts/${row.id}`,
-        payload
-      );
+      const response = await updatePost(row.id, payload);
 
       if (response.status === 200) {
         message.success('Post updated successfully');
@@ -47,7 +48,7 @@ const FormUpdateModal = (props) => {
   };
 
   return (
-    <Modal title="Create Posts" open={open} onCancel={handleClose} footer={false}>
+    <Modal title="Update Posts" open={open} onCancel={handleClose} footer={false}>
       <br />
 
       <Form layout="vertical" form={form} onFinish={onFinish}>

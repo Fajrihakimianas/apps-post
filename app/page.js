@@ -4,11 +4,16 @@ import { useEffect, useState } from 'react';
 import FormModal from '@/pages/form/pages';
 import Header from '@/pages/header/page';
 import { Button, Table } from 'antd';
-import axios from 'axios';
 import FormUpdateModal from '@/pages/form/update/page';
+import { useDispatch, useSelector } from 'react-redux';
+import { getAllDataPosts } from '@/api';
+import { getDataPost } from '@/lib/posts/postSlice';
 
 export default function Home() {
-  const [data, setData] = useState([]);
+  const dispatch = useDispatch();
+
+  const posts = useSelector((state) => state.posts);
+
   const [row, setRow] = useState(null);
   const [modal, setModal] = useState({
     isFormModalOpen: false,
@@ -16,31 +21,8 @@ export default function Home() {
   });
 
   useEffect(() => {
-    getDataPosts();
-  }, []);
-
-  const getDataPosts = async () => {
-    try {
-      const response = await axios.get('https://jsonplaceholder.typicode.com/posts');
-      console.log(response);
-
-      if (response.status === 200) {
-        const data = response.data.map((item, index) => {
-          return {
-            id: item.id,
-            key: index,
-            no: index + 1,
-            title: item.title,
-            body: item.body,
-          };
-        });
-
-        setData(data);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
+    getAllDataPosts().then((data) => dispatch(getDataPost(data)));
+  }, [dispatch]);
 
   const toggleModal = (name) => {
     setModal((prev) => ({ ...prev, [name]: !prev[name] }));
@@ -49,8 +31,8 @@ export default function Home() {
   const columns = [
     {
       title: 'No',
-      dataIndex: 'no',
-      key: 'no',
+      dataIndex: 'id',
+      key: 'id',
     },
     {
       title: 'title',
@@ -107,13 +89,12 @@ export default function Home() {
           Add Post
         </Button>
 
-        <Table columns={columns} dataSource={data} rowClassName={handleRow} />
+        <Table columns={columns} dataSource={posts.posts} rowClassName={handleRow} />
 
         <FormModal
           open={modal.isFormModalOpen}
           toggle={() => {
             toggleModal('isFormModalOpen');
-            getDataPosts();
           }}
         />
 
@@ -122,7 +103,6 @@ export default function Home() {
           open={modal.isFormUpdateModalOpen}
           toggle={() => {
             toggleModal('isFormUpdateModalOpen');
-            getDataPosts();
           }}
         />
       </div>

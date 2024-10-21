@@ -3,6 +3,7 @@
 import React from 'react';
 import { Button, Form, Input, Modal, message } from 'antd';
 import axios from 'axios';
+import { addPost } from '@/api';
 
 const FormModal = (props) => {
   const { open, toggle } = props;
@@ -15,8 +16,6 @@ const FormModal = (props) => {
   };
 
   const onFinish = async (values) => {
-    console.log(values);
-
     const payload = {
       title: values.title,
       body: values.body,
@@ -24,10 +23,7 @@ const FormModal = (props) => {
     };
 
     try {
-      const response = await axios.post(
-        'https://jsonplaceholder.typicode.com/posts',
-        payload
-      );
+      const response = await addPost(payload);
 
       if (response.status === 201) {
         message.success('Post created successfully');
